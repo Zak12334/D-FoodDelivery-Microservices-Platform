@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  order-service:
+    build:
+      context: ./order_service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - PAYMENT_SERVICE_ADDRESS=payment-service:50052
+    command: python order_service.py --port=50051 --payment-service=payment-service:50052
+    networks:
+      - microservices-network
+    depends_on:
+      - payment-service
+
+  payment-service:
+    build:
+      context: ./payment_service
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50052"
+    environment:
+      - ORDER_SERVICE_ADDRESS=order-service:50051
+    command: python payment_service.py --port=50052 --order-service=order-service:50051
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ORDER_SERVICE_ADDRESS=order-service:50051
+      - PAYMENT_SERVICE_ADDRESS=payment-service:50052
+      - API_GATEWAY_PORT=8000
+    networks:
+      - microservices-network
+    depends_on:
+      - order-service
+      - payment-service
+    command: python api_gateway.py
+
+  test-client:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    networks:
+      - microservices-network
+    depends_on:
+      - order-service
+      - payment-service
+    command: python test_client.py --order-service=order-service:50051 --payment-service=payment-service:50052
+
+networks:
+  microservices-network:
+    driver: bridge

@@ -1,0 +1,192 @@
+The Inspired Food Company - Microservices Implementation
+This README outlines the steps to deploy and test the microservices architecture for The Inspired Food Company's online food ordering platform, focusing on the Order Service and Payment Service.
+
+Prerequisites
+Docker and Docker Compose installed on your system.
+
+Setup and Running Instructions
+Running the Application
+Clone or download the repository:
+
+Ensure you have the project files on your local machine.
+Navigate to the project directory:
+
+Open a terminal and change to the project directory.
+Start the application using Docker Compose:
+
+Execute the following command to build and start the services:
+docker-compose up --build
+
+What to Expect
+The system will execute a series of automated tests to demonstrate functionality, including:
+
+Creating and managing orders.
+Processing payments and handling refunds.
+Inter-service communication via gRPC.
+Logs will display in the console, showing real-time interactions and outcomes of the tests.
+
+Running Tests
+For additional testing or to rerun tests:
+
+Start the services:
+
+Run the services without the test client:
+docker-compose up -d order-service payment-service
+
+
+Run the test client:
+To execute the test client separately
+
+
+To deploy and run the API Gateway along with the microservices, use the following Docker Compose commands:
+docker-compose build api-gateway
+docker-compose up -d api-gateway
+------------------------------------------------------------------------------------------------------------------------
+# Author: Zak Osman
+# Course: SOFT8026 - Data-Driven Microservices
+# Assignment: #2 - Kubernetes Deployment, Testing, and Serverless Functions
+
+## SETUP INSTRUCTIONS
+-----------------
+
+# 1. REPOSITORY STRUCTURE
+   - The main folder structure includes:
+     * kubernetes/ (contains all Kubernetes deployment and service files)
+       - api-deploy.yaml
+       - api-svc.yaml
+       - app-config
+       - app-config.yaml
+       - gateway-route.yaml
+       - kustomization.yaml
+       - order-deploy.yaml
+       - order-svc.yaml
+       - payment-deploy.yaml
+       - payment-svc.yaml
+     * api_gateway/ (API Gateway service code)
+     * order_service/ (Order Service code)
+     * payment_service/ (Payment Service code)
+     * Documentation.pdf (Assignment documentation)
+
+# 2. KUBERNETES DEPLOYMENT
+   - Building and pushing Docker images:
+   ```bash
+   # Navigate to API Gateway service directory
+   cd api_gateway
+   # Build Docker image for API Gateway service
+   docker build -t zakos1/api-gateway:latest .
+   
+   # Navigate to Order Service directory
+   cd ../order_service
+   # Build Docker image for Order Service
+   docker build -t zakos1/order-service:latest .
+   
+   # Navigate to Payment Service directory
+   cd ../payment_service
+   # Build Docker image for Payment Service
+   docker build -t zakos1/payment-service:latest .
+   
+   # Push images to Docker Hub
+   docker push zakos1/api-gateway:latest
+   docker push zakos1/order-service:latest
+   docker push zakos1/payment-service:latest
+   -------------------------------------------------------------------
+# Deploying to Kubernetes:
+
+# Apply deployment configurations
+kubectl apply -f api-deploy.yaml
+kubectl apply -f order-deploy.yaml
+kubectl apply -f payment-deploy.yaml
+
+# Apply service configurations
+kubectl apply -f api-svc.yaml
+kubectl apply -f order-svc.yaml
+kubectl apply -f payment-svc.yaml
+
+# Apply other configurations
+kubectl apply -f app-config.yaml
+kubectl apply -f gateway-route.yaml
+
+# Alternatively, use kustomization for deployment
+kubectl apply -k .
+
+# Verify deployments
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+# 3. TESTING AND MONITORING
+# Deploy Kubernetes Dashboard
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+# Create service account for dashboard access
+kubectl create serviceaccount dashboard-admin-sa
+
+# Create cluster role binding for admin access
+kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=default:dashboard-admin-sa
+
+# Start the dashboard proxy
+kubectl proxy
+
+# Generate login token (run in new terminal)
+kubectl create token dashboard-admin-sa
+
+Access the dashboard at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+# Non-Functional Test - Load Testing with Apache Bench
+
+# Port forward the service to a local port
+kubectl port-forward svc/demo-nginx 8080:80
+
+# Run Apache Bench load test (from XAMPP directory)
+cd D:\XAMPP\apache\bin(or where XAMPP is located on your device)
+.\ab.exe -n 100 -c 10 http://localhost:8080/
+
+
+# Functional Test - API Testing with Postman
+Open Postman
+Create a new collection called "Microservice API Tests"
+Add a GET request to your service: http://localhost:8080/
+Add basic test script:
+
+pm.test("Status code is 200", function () {
+  pm.response.to.have.status(200);
+});
+
+pm.test("Response time is acceptable", function () {
+  pm.expect(pm.response.responseTime).to.be.below(1000);
+});
+
+Run the test to verify API functionality
+
+# 4. SERVERLESS FUNCTION CONCEPT
+The application includes a proposed Order Notification serverless function explained in the video that:
+
+Is triggered when a new order is processed
+Sends confirmation emails to customers
+Integrates with the Order Service via event-driven architecture
+Scales automatically based on demand
+
+# ARCHITECTURE OVERVIEW
+
+The application follows a microservices architecture with:
+
+API Gateway: Entry point for client requests
+Order Service: Handles order creation and management
+Payment Service: Processes payments and refunds
+Kubernetes: Orchestrates deployments with a 3:2:1 replica ratio for optimal scaling
+
+# THIRD-PARTY TOOLS
+
+This project uses the following third-party tools:
+
+Kubernetes: For container orchestration
+Docker: For containerization
+Postman: For API testing
+Apache Bench: For load testing
+Kubernetes Dashboard: For cluster monitoring
+
+# COMPATIBILITY
+This deployment has been tested with:
+
+Kubernetes via Docker Desktop
+kubectl version 1.28+

@@ -1,0 +1,13 @@
+# kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - api-deploy.yaml
+  - order-deploy.yaml
+  - payment-deploy.yaml
+  - api-svc.yaml
+  - order-svc.yaml
+  - payment-svc.yaml
+  - gateway-route.yaml
+  - app-config.yaml

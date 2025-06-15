@@ -1,0 +1,12 @@
+# payment-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  selector:
+    app: payment-service
+  ports:
+  - port: 50052
+    targetPort: 50052
+  type: ClusterIP

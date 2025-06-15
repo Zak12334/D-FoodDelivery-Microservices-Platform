@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package payment;
+
+service PaymentService {
+  // Process a payment for an order
+  rpc ProcessPayment(ProcessPaymentRequest) returns (PaymentResponse);
+  
+  // Get payment transaction details
+  rpc GetTransaction(GetTransactionRequest) returns (PaymentResponse);
+}
+
+message ProcessPaymentRequest {
+  string order_id = 1;
+  string customer_id = 2;
+  double amount = 3;
+  PaymentMethod payment_method = 4;
+  string payment_token = 5;  // For card/digital payments
+}
+
+message GetTransactionRequest {
+  string transaction_id = 1;
+}
+
+message PaymentResponse {
+  string transaction_id = 1;
+  string order_id = 2;
+  string customer_id = 3;
+  double amount = 4;
+  PaymentMethod payment_method = 5;
+  PaymentStatus status = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  string error_message = 9;
+}
+
+enum PaymentMethod {
+  CREDIT_CARD = 0;
+  DEBIT_CARD = 1;
+  DIGITAL_WALLET = 2;
+  CASH_ON_DELIVERY = 3;
+}
+
+enum PaymentStatus {
+  PAYMENT_PENDING = 0;
+  PAYMENT_PROCESSING = 1;
+  PAYMENT_COMPLETED = 2;
+  PAYMENT_FAILED = 3;
+  PAYMENT_REFUNDED = 4;
+}
