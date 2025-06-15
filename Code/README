@@ -43,8 +43,7 @@ docker-compose build api-gateway
 docker-compose up -d api-gateway
 ------------------------------------------------------------------------------------------------------------------------
 # Author: Zak Osman
-# Course: SOFT8026 - Data-Driven Microservices
-# Assignment: #2 - Kubernetes Deployment, Testing, and Serverless Functions
+Kubernetes Deployment, Testing, and Serverless Functions
 
 ## SETUP INSTRUCTIONS
 -----------------
